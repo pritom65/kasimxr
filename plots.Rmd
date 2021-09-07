@@ -1,0 +1,61 @@
+---
+title: "Untitled"
+author: "pritom"
+date: "9/7/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(latex2exp)
+df <- read_csv("000webhost_Extracted_PINs.csv")
+```
+
+```{r}
+expand_grid(firstTwo = 0:99,
+            lastTwo = 0:99) %>%
+    full_join(
+        df %>%
+            filter( nchar(CommonPINs) == 4) %>%
+            mutate(CommonPINs = as.numeric(CommonPINs),
+                   firstTwo = CommonPINs %/% 100,
+                   lastTwo = CommonPINs %% 100) %>%
+            count(firstTwo, lastTwo) %>%
+            na.omit(),
+        by = c("firstTwo", "lastTwo")
+    ) %>% 
+    mutate(n = ifelse(is.na(n), 1, n+1),
+           n = n/sum(n),
+           n = -log2(n)) %>% 
+    ggplot(aes(firstTwo, lastTwo, fill = n)) +
+    geom_tile() +
+    scale_fill_gradient(TeX("-log_2(PIN)"),low = "blue", high = "white") +
+    theme_minimal() +
+    labs(title = "4 disit pins", x = "Second two PIN disit", y = "First two PIN disit") +
+    scale_x_continuous(breaks = seq(0,99,5), labels = c("00","05",seq(10,99,5))) +
+    scale_y_continuous(breaks = seq(0,99,5), labels = c("00","05",seq(10,99,5))) 
+    scale_fill_continuous(limits = 4:16)
+    theme()
+```
+
+$$
+
+$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
